@@ -16,6 +16,9 @@ void draw(){
    background(49);
    
   }
+  else if(gameState == 2){
+    
+  }
   
 }
 
@@ -28,5 +31,6 @@ void state0(){
 }
 
 void state1(){
+  
   
 }
