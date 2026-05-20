@@ -31,6 +31,8 @@ void state0(){
 }
 
 void state1(){
-  
+  if(mousePressed && mouseButton == LEFT){
+    
+  }
   
 }

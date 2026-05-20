@@ -1,6 +1,7 @@
 class Player{
+ ArrayList<Accessory> addons;
  int hp, atk, def;
- double grow;
+ double grow, water, food;
  String type, name;
  Player(String type, String name){
    this.type = type;
@@ -9,7 +10,10 @@ class Player{
    atk = 1;
    def = 1;
    grow = 1;
+   water = 10;
+   food = 10;
  }
+ 
   
   
   
