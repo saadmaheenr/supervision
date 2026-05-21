@@ -3,6 +3,7 @@ class Player{
  int hp, atk, def;
  double grow, water, food;
  String type, name;
+ PImage[] sprite;
  Player(String type, String name){
    this.type = type;
    this.name = name;

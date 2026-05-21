@@ -3,7 +3,7 @@ class Event{
   int intensity;
   String belowPar, onPar, abovePar;
   int damage;
-  
+  PImage sprite;
   Accessory add;
   Event(String n, String t, String m, Accessory add){
    name = n;
@@ -11,11 +11,6 @@ class Event{
    message = m;
    this.add = add;
   }
-   Event(String n, String t, String m, Accessory add){
-   name = n;
-   type = t;
-   message = m;
-   this.add = add;
-  }
+
   
 }
