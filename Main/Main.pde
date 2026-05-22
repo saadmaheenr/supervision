@@ -1,11 +1,15 @@
 Player p;
 int gameState;
+PFont font;
+String currentText;
 // 0 = Title
 // 1 = Settings
 // 2 = Game
 // 3 = Ending
 void setup(){
  size(800, 600);
+ font = createFont("ByteBounce.ttf",  50);
+ textFont(font);
  
 }
 void draw(){
@@ -42,16 +46,20 @@ void state1(){
 void state2(){
   background(0);
   rect(150, 150, 400, 200); //Player
-  rect(0, 500, 800, 100);
+  rect(0, 500, 799, 100);
+  fill(255);
+  textDisplay(currentText);
 }
 
 void state3(){
   
 }
 void textDisplay(){
-  
+  // Iterates through the text
+  text(currentText, 10, 540);
   
 }
+
 boolean over(int x, int y, int width, int height)  {
     if (mouseX >= x && mouseX <= x+width && 
         mouseY >= y && mouseY <= y+height) {
