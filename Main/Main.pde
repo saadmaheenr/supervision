@@ -46,11 +46,13 @@ void state0(){
 }
 
 void state1(){
-  rect(100, 100, 300, 100);
-  rect(100, 250, 300, 100);
-  rect(100, 400, 300, 100);
+  rect(100, 100, 400, 100);
+  rect(100, 250, 400, 100);
+  rect(100, 400, 400, 100);
   if(mousePressed && mouseButton == LEFT){
-    
+    if(over(100, 100, 400, 100)){
+      gameState = 2;
+    }
   }
   
 }
