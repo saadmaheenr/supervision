@@ -1,7 +1,6 @@
-Player p;
 int gameState;
 import org.guilhermesilveira.Timers;
-
+Player p;
 PFont font;
 String currentText;
 int difficulty = 1;
@@ -12,6 +11,7 @@ int[] ends = {60, 300, 600, 1200};
 int endTime = 1;
 int endGame;
 PImage title;
+boolean letGo;
 PImage textbox;
 // 0 = Title
 // 1 = Settings
@@ -32,10 +32,8 @@ void draw(){
    state1();
   }
   else if(gameState == 2){
-    p.hp = 20 / difficulty;
-    if(difficulty == 3){
-      p.hp = 1;
-    }
+    background(49);
+    p = new Player("plant", "Sand", 12/(difficulty + 1));
     endGame = ends[endTime];
     state2();
   }
@@ -48,6 +46,8 @@ void state0(){
   int pos = 100;
   title = loadImage("title.png");
   image(title,200, pos);//Title
+  fill(0);
+  text("press any key", 260,500);
   if(keyPressed){
     gameState = 1;
   }
@@ -76,7 +76,7 @@ void state1(){
   text("Start", 120,450);
   fill(255);
   
-  if(mousePressed && mouseButton == LEFT){
+  if(mousePressed && mouseButton == LEFT && letGo == true){
     if(over(100, 100, 400, 100)){
       if(difficulty == 3){
         difficulty = 0;
@@ -96,6 +96,10 @@ void state1(){
     if(over(100, 400, 400, 100)){
       gameState = 2;
     }
+    letGo = false;
+  }
+  if(mousePressed == false){
+    letGo = true;
   }
   
 }
@@ -103,14 +107,24 @@ void state1(){
 void state2(){
   background(0);
   textbox = loadImage("text-box.png");
-  rect(150, 150, 400, 200); //Player
+   //Player
   image(textbox, 0, 500, 799, 100);
   fill(255);
-  currentText = "One day there will be a game here..";
+  rect(100, 100, 400, 100);
   fill(0);
-  textDisplay(currentText);
-  text("Time " + time, 120,150);
+  text("Take Damage (WIP)", 120,150);
+  fill(255);
+  text("HP: " + p.getHp(), 600,150);
+  rect(100, 250, 400, 100);
+  fill(0);
+  text("Heal Damage (WIP)", 120, 300);
+  fill(255);
   
+  
+  
+  
+  currentText = "One day there will be a game here..";
+  textDisplay(currentText);
 }
 
 void state3(){
@@ -118,7 +132,7 @@ void state3(){
 }
 void textDisplay(String e){
   // Iterates through the text
-  text(currentText, 20, 540);
+  text(e, 20, 540);
   
 }
 

@@ -4,17 +4,19 @@ class Player{
  double grow, water, food;
  String type, name;
  PImage[] sprite;
- Player(String type, String name){
+ Player(String type, String name, int hp){
    this.type = type;
    this.name = name;
-   hp = 20;
+   this.hp = hp;
    atk = 1;
    def = 1;
    grow = 1;
    water = 10;
    food = 10;
  }
- 
+ int getHp(){
+   return hp;
+ }
   
   
   
