@@ -2,6 +2,8 @@ Player p;
 int gameState;
 PFont font;
 String currentText;
+PImage title;
+PImage textbox;
 // 0 = Title
 // 1 = Settings
 // 2 = Game
@@ -29,14 +31,24 @@ void draw(){
 }
 
 void state0(){
-  rect(200, 100, 400, 200); //Title
+  int pos = 100;
+  title = loadImage("title.png");
+  image(title,200, pos);//Title
   if(keyPressed){
-    gameState = 2;
+    gameState = 1;
   }
-  
+  if(pos == 100){
+    pos+= 10;
+  }
+  if(pos == 110){
+    pos -= 10;
+  }
 }
 
 void state1(){
+  rect(100, 100, 300, 100);
+  rect(100, 250, 300, 100);
+  rect(100, 400, 300, 100);
   if(mousePressed && mouseButton == LEFT){
     
   }
@@ -45,24 +57,27 @@ void state1(){
 
 void state2(){
   background(0);
+  textbox = loadImage("text-box.png");
   rect(150, 150, 400, 200); //Player
-  rect(0, 500, 799, 100);
+  image(textbox, 0, 500, 799, 100);
   fill(255);
+  currentText = "Yay Yay Yay";
+  fill(0);
   textDisplay(currentText);
 }
 
 void state3(){
   
 }
-void textDisplay(){
+void textDisplay(String e){
   // Iterates through the text
-  text(currentText, 10, 540);
+  text(currentText, 20, 540);
   
 }
 
-boolean over(int x, int y, int width, int height)  {
-    if (mouseX >= x && mouseX <= x+width && 
-        mouseY >= y && mouseY <= y+height) {
+boolean over(int x, int y, int setw, int seth)  {
+    if (mouseX >= x && mouseX <= x+setw && 
+        mouseY >= y && mouseY <= y+seth) {
       return true;
   } else {
     return false;
