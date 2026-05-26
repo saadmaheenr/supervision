@@ -1,7 +1,18 @@
-Player p;
 int gameState;
+import org.guilhermesilveira.Timers;
+Player p;
 PFont font;
 String currentText;
+int difficulty = 1;
+String[] diff = {"Easy", "Normal", "Hard", "1hit"};
+int time = 0;
+int startTime = 0;
+int[] ends = {60, 300, 600, 1200};
+int endTime = 1;
+int endGame;
+PImage title;
+boolean letGo;
+PImage textbox;
 // 0 = Title
 // 1 = Settings
 // 2 = Game
@@ -21,6 +32,9 @@ void draw(){
    state1();
   }
   else if(gameState == 2){
+    background(49);
+    p = new Player("plant", "Sand", 12/(difficulty + 1));
+    endGame = ends[endTime];
     state2();
   }
   else if(gameState == 3){
@@ -29,40 +43,102 @@ void draw(){
 }
 
 void state0(){
-  rect(200, 100, 400, 200); //Title
+  int pos = 100;
+  title = loadImage("title.png");
+  image(title,200, pos);//Title
+  fill(0);
+  text("press any key", 260,500);
   if(keyPressed){
-    gameState = 2;
+    gameState = 1;
   }
-  
+  if(pos == 100 && random(1) > 0){
+    pos+= 10;
+  }
+  if(pos == 110 && random(1) > 0){
+    pos -= 10;
+  }
 }
 
 void state1(){
-  if(mousePressed && mouseButton == LEFT){
-    
+  fill(255);
+  rect(100, 100, 400, 100);
+  fill(0);
+  text("Select Difficulty", 120,150);
+  fill(255);
+  text(diff[difficulty], 600,150);
+  rect(100, 250, 400, 100);
+  fill(0);
+  text("Select Time", 120, 300);
+  fill(255);
+  text(ends[endTime]/60 + " minutes", 600, 300);
+  rect(100, 400, 400, 100);
+  fill(0);
+  text("Start", 120,450);
+  fill(255);
+  
+  if(mousePressed && mouseButton == LEFT && letGo == true){
+    if(over(100, 100, 400, 100)){
+      if(difficulty == 3){
+        difficulty = 0;
+      }
+      else{
+      difficulty++;
+      }
+    }
+    if(over(100, 250, 400, 100)){
+      if(endTime == 3){
+        endTime = 0;
+      }
+      else{
+      endTime++;
+      }
+    }
+    if(over(100, 400, 400, 100)){
+      gameState = 2;
+    }
+    letGo = false;
+  }
+  if(mousePressed == false){
+    letGo = true;
   }
   
 }
 
 void state2(){
   background(0);
-  rect(150, 150, 400, 200); //Player
-  rect(0, 500, 799, 100);
+  textbox = loadImage("text-box.png");
+   //Player
+  image(textbox, 0, 500, 799, 100);
   fill(255);
+  rect(100, 100, 400, 100);
+  fill(0);
+  text("Take Damage (WIP)", 120,150);
+  fill(255);
+  text("HP: " + p.getHp(), 600,150);
+  rect(100, 250, 400, 100);
+  fill(0);
+  text("Heal Damage (WIP)", 120, 300);
+  fill(255);
+  
+  
+  
+  
+  currentText = "One day there will be a game here..";
   textDisplay(currentText);
 }
 
 void state3(){
   
 }
-void textDisplay(){
+void textDisplay(String e){
   // Iterates through the text
-  text(currentText, 10, 540);
+  text(e, 20, 540);
   
 }
 
-boolean over(int x, int y, int width, int height)  {
-    if (mouseX >= x && mouseX <= x+width && 
-        mouseY >= y && mouseY <= y+height) {
+boolean over(int x, int y, int setw, int seth)  {
+    if (mouseX >= x && mouseX <= x+setw && 
+        mouseY >= y && mouseY <= y+seth) {
       return true;
   } else {
     return false;
