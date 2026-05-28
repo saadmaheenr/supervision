@@ -3,6 +3,7 @@ import org.guilhermesilveira.Timers;
 Player p;
 PFont font;
 String currentText;
+int k = 1;
 boolean letGo;
 boolean letGoKey;
 
@@ -143,8 +144,13 @@ void state3(){
 }
 void textDisplay(String e){
   // Iterates through the text, WIP
-  text(e, 20, 540);
-  
+  new Timers(this).add(e.length(), 100, () -> textDisplayHelper(e) );
+  k = 1;
+}
+void textDisplayHelper(String e){
+  fill(0);
+  text(e.substring(0, k), 20, 540);
+  k++;
 }
 
 boolean over(int x, int y, int setw, int seth)  {
