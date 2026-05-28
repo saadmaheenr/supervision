@@ -3,15 +3,23 @@ import org.guilhermesilveira.Timers;
 Player p;
 PFont font;
 String currentText;
+boolean letGo;
+boolean letGoKey;
+
 int difficulty = 1;
 String[] diff = {"Easy", "Normal", "Hard", "1hit"};
+
 int time = 0;
 int startTime = 0;
 int[] ends = {60, 300, 600, 1200};
 int endTime = 1;
 int endGame;
 PImage title;
-boolean letGo;
+
+PImage[] players = new PImage[3];
+String[] names = {"Shroom", "Bunny", "Frog"};
+int player; //0-2
+//PImage[] playerState
 PImage textbox;
 // 0 = Title
 // 1 = Settings
@@ -20,8 +28,10 @@ PImage textbox;
 void setup(){
  size(800, 600);
  font = createFont("ByteBounce.ttf",  50);
+ players[0] = loadImage("shroom.png");
+ players[1] = loadImage("bunny.png");
+ players[2] = loadImage("frog.png");
  textFont(font);
- 
 }
 void draw(){
   if(gameState == 0){
@@ -61,6 +71,7 @@ void state0(){
 
 void state1(){
   fill(255);
+  text(names[player], 100,80);
   rect(100, 100, 400, 100);
   fill(0);
   text("Select Difficulty", 120,150);
@@ -101,28 +112,28 @@ void state1(){
   if(mousePressed == false){
     letGo = true;
   }
+  if(keyPressed && letGoKey){
+    if(player == 2){
+        player = 0;
+      }
+      else{
+      player++;
+      }
+     letGoKey = false;
+     
+  }
+  if(keyPressed == false){
+    letGoKey = true;
+  }
   
 }
 
 void state2(){
   background(0);
   textbox = loadImage("text-box.png");
-   //Player
+  image(players[player], 275, 150, 256, 256);
   image(textbox, 0, 500, 799, 100);
-  fill(255);
-  rect(100, 100, 400, 100);
   fill(0);
-  text("Take Damage (WIP)", 120,150);
-  fill(255);
-  text("HP: " + p.getHp(), 600,150);
-  rect(100, 250, 400, 100);
-  fill(0);
-  text("Heal Damage (WIP)", 120, 300);
-  fill(255);
-  
-  
-  
-  
   currentText = "One day there will be a game here..";
   textDisplay(currentText);
 }
@@ -131,7 +142,7 @@ void state3(){
   
 }
 void textDisplay(String e){
-  // Iterates through the text
+  // Iterates through the text, WIP
   text(e, 20, 540);
   
 }
