@@ -5,7 +5,6 @@ class Proj {
   PVector acceleration;
   PImage sprite;
   color c;
-  int limit= 7;
   Gif sprit;
   float mass;
   ArrayList<PVector> forces = new ArrayList<PVector>();
@@ -20,12 +19,9 @@ class Proj {
   }
   Proj(float x, float y, float xVel, float yVel, int i) {
     if(i == 0){
-      sprite = loadImage("bubbleshroom.png");
-    }
-    if(i == 1){
       sprite = loadImage("bubblebun.png");
     }
-    if(i == 2){
+    if(i == 1){
       sprite = loadImage("bubbleall.png");
     }
     if(i == 3){
@@ -65,7 +61,7 @@ class Proj {
     location.add(velocity);
     velocity.add(acceleration);
     acceleration = new PVector(0, 0);
-    velocity.limit(15); 
+    velocity.limit(7); 
   }
   void movet() {
     location.add(velocity);
@@ -73,9 +69,7 @@ class Proj {
     acceleration = new PVector(0, 0);
     velocity.limit(2); 
   }
-  void setLimit(int i){
-    limit = i;
-  }
+  
   void bounce() {
     // Update your bounce code to use vectors
     if (location.x <= 0) {

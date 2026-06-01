@@ -1,8 +1,10 @@
+// Design Document https://docs.google.com/document/d/1q6pcNHOzePtnTnFkWSbN_ncsATD2z56XCs1AGmRwTWg/edit?usp=sharing
 import gifAnimation.*;
 int gameState;
 int hp;
 Proj main;
 PFont font;
+int rande;
 String currentText = "";
 boolean letGo;
 boolean letGoKey;
@@ -18,15 +20,17 @@ PVector tC;
 ArrayList<Proj> projListD;
 Proj TD;
 PVector tD;
+int c = 0;
 Gif bullet;
+Gif bunnyend;
+Gif allayend;
 int difficulty = 1;
 String[] diff = {"Easy", "Normal", "Hard"};
-int[] events = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 int parry = 5;
 double mill = 0;
 int time = 0; 
 int startTime = 0;
-int[] ends = {60, 120, 180, 300};
+int[] ends = {2, 120, 180, 300};
 int endTime = 1;
 int endGame;
 int projCount;
@@ -36,8 +40,9 @@ PImage button;
 boolean run2 = true;
 boolean reset = true;
 boolean par = true;
-boolean enabledmg = true;
-String[] names = {"Shroom", "Bunny", "Allay"};
+boolean bounce = false;
+boolean setrandom;
+String[] names = {"Bunny", "Allay"};
 int player; //0-2
 //PImage[] playerState
 PImage game;
@@ -50,6 +55,10 @@ PImage gamebg;
 void setup(){
  size(800, 1000);
  bullet = new Gif(this, "bullet.gif");
+ bunnyend = new Gif(this, "bunnyend.gif");
+ bunnyend.loop();
+ allayend = new Gif(this, "allayend.gif");
+ allayend.loop();
  font = createFont("ByteBounce.ttf",  50);
  textFont(font);
  TA = new Proj(100, 400, 20, 2, 3);
@@ -61,6 +70,10 @@ void setup(){
  TD = new Proj(500, 600, -2, 1, 3);
  tD = TD.getPos();
 }
+static int limit= 7;
+static void setLimit(int i){
+    limit = i;
+  }
 void draw(){
   if(gameState == 0){
     state0(); 
@@ -90,7 +103,7 @@ void draw(){
    for(int i = 0; i < projCount; i++){
    projListD.add(new Proj(tD.x, tD.y, random(-360,360), random(-360,360), bullet));
  }
-    hp = (int)(10/(difficulty + 1));
+    hp = (int)(20/(difficulty + 1));
     mill = millis();
     endGame = ends[endTime];
     run2 = false;
@@ -127,13 +140,41 @@ void state2(){
   moveTurret();
   /* Events:
   0: Projectile speed increase
-  1: Spawn homing projectiles
-  2: Laser comes down on 1 of 3 columns
-  3: Extra parries
-  4: Wind pushes player in a random direction
+  1: Laser comes down on 1 of 3 columns
+  2: Extra parries
+  3: Wind pushes player in a random direction
+  4: Hud dissapears
+  5: Lucky lucky
   */
-  if(time % 20 == 0){
+
+  if(time % 20 == 0 && time != 0){
+    setLimit(7);
+    bounce = false;
+    c = 0;
+    if(rande == 0){
+     setLimit(12);
+     currentText = "Zooom!";
+    }
+    if(rande == 1){
+      bounce = true;
+      currentText = "Boing";
+    }
+    if(rande == 2){
+      parry = 8; 
+      currentText = "Ding ding!";
+      rande = 9;
+    }
+    if(rande == 3){
+      c = 255;
+      currentText = "Where'd everything go?";
+    }
+    if(rande > 3 && rande < 9){
+      currentText = "Keep going..";
+    }
     
+  }
+  else{
+    rande = (int)(random(5));
   }
   if(mousePressed && mouseButton == LEFT && par == true){
     if(parry <= 0){
@@ -165,11 +206,12 @@ void state2(){
   
   game = loadImage("game.png");
   image(game, 0, 0, 800, 1000);
-  fill(0);
+  fill(c);
   textSize(75);
+  text(names[player], 50,75);
   text(hp, 400,120);
   text(parry, 550,120);
-  text(endGame - time, 668,120);
+  text(endGame - time, 680,120);
   textDisplay();
   if((time + 1) % 3 == 0){
     TA.changetB();
@@ -200,8 +242,10 @@ PVector getMainPos(){
   return main.getPos();
 }
 void reduceHp(){
-  if(enabledmg == true){
-  hp--;}
+  hp--;
+}
+void kill(){
+  hp = 0;
 }
 void moveTurret(){
   TA.tdisplay();
@@ -245,28 +289,32 @@ void resetProjectile(){
   
 }
 void moveMain(){
-  main.move();
+  main.movenolim();
   main.bounce();
   PVector pos = main.getPos();
-  PVector force = new PVector((mouseX - pos.x)/100, (mouseY - pos.y)/100);
+  PVector force = new PVector((mouseX - pos.x)/40, (mouseY - pos.y)/40);
   main.applyForce(force);
   
 }
 void moveProjectile(){
   for (Proj p : projListA) {
     p.move();
+    if(bounce){ p.bounce();}
     p.display();
   }
  for (Proj p : projListB) {
     p.move();
+    if(bounce){ p.bounce();}
     p.display();
   }
   for (Proj p : projListC) {
     p.move();
+    if(bounce){ p.bounce();}
     p.display();
   }
  for (Proj p : projListD) {
     p.move();
+    if(bounce){ p.bounce();}
     p.display();
   }
 }
@@ -278,11 +326,37 @@ void textDisplay(){
 
 
 void state3(){
-  
+  image(titlebg, 0, 0, 800, 1000);
+  game = loadImage("game.png");
+  image(game, 0, 0, 800, 1000);
+  fill(0);
+  textSize(75);
+  text(names[player], 50,75);
+  text(hp, 400,120);
+  text(parry, 550,120);
+  text(0, 668,120);
+  textSize(200);
+  if(player == 0){
+  image(bunnyend, 260, 400);}
+  else{
+    image(allayend, 260, 400);
+  }
+  text("END :)", 230,900);
 }
 
 void state4(){
-  
+  image(gamebg, 0, 0, 800, 1000);
+  game = loadImage("game.png");
+  image(game, 0, 0, 800, 1000);
+  fill(0);
+  textSize(75);
+  text(names[player], 50,75);
+  text(0, 400,120);
+  text(parry, 550,120);
+  text(endGame - time, 680,120);
+  fill(255);
+  textSize(200);
+  text("END ):", 230,900);
 }
 
 void state0(){
@@ -313,7 +387,7 @@ void state1(){
   image(button, 220, 650, 350, 140);
   text(ends[endTime]/60 + " minutes", 260, 740);
  
-  text("START", 260, 900);
+  text("START: " + names[player], 220, 900);
   
   if(mousePressed && mouseButton == LEFT && letGo == true){
     if(over(220, 440, 350, 140)){
@@ -332,7 +406,7 @@ void state1(){
       endTime++;
       }
     }
-    if(over(220, 900, 350, 140)){
+    if(over(220, 800, 350, 140)){
       gameState = 2;
     }
     letGo = false;
@@ -341,7 +415,7 @@ void state1(){
     letGo = true;
   }
   if(keyPressed && letGoKey){
-    if(player == 2){
+    if(player == 1){
         player = 0;
       }
       else{
