@@ -7,17 +7,17 @@ String currentText;
 boolean letGo;
 boolean letGoKey;
 ArrayList<Proj> projListA;
-float tAX = 0;
-float tAY = 400;
+Proj TA;
+PVector tA;
 ArrayList<Proj> projListB;
-float tBX = 700;
-float tBY = 400;
+Proj TB;
+PVector tB;
 ArrayList<Proj> projListC;
-float tCX = 200;
-float tCY = 650;
+Proj TC;
+PVector tC;
 ArrayList<Proj> projListD;
-float tDX = 500;
-float tDY = 650;
+Proj TD;
+PVector tD;
 Gif bullet;
 int difficulty = 1;
 String[] diff = {"Easy", "Normal", "Hard"};
@@ -46,13 +46,17 @@ PImage game;
 // 3 = Ending
 void setup(){
  size(800, 1000);
- 
  bullet = new Gif(this, "bullet.gif");
- 
- 
  font = createFont("ByteBounce.ttf",  50);
  textFont(font);
- 
+ TA = new Proj(100, 400, 20, 2, 3);
+ tA = TA.getPos();
+ TB = new Proj(400, 300, -1, -1, 3);
+ tB = TB.getPos();
+ TC = new Proj(200, 500, 3, -2, 3);
+ tC = TC.getPos();
+ TD = new Proj(500, 600, -2, 1, 3);
+ tD = TD.getPos();
 }
 void draw(){
   if(gameState == 0){
@@ -68,20 +72,21 @@ void draw(){
     main = new Proj(400, 400, 0, 0, player);
     projCount = difficulty + 1;
     projListA =  new ArrayList<Proj>();
+    
    for(int i = 0; i < projCount; i++){
-   projListA.add(new Proj(tAX, tAY, random(-360,360), random(-360,360), bullet));
+   projListA.add(new Proj(tA.x, tA.y, random(-360,360), random(-360,360), bullet));
  }
  projListB =  new ArrayList<Proj>();
    for(int i = 0; i < projCount; i++){
-   projListB.add(new Proj(tBX, tBY, random(-360,360), random(-360,360), bullet));
+   projListB.add(new Proj(tB.x, tB.y, random(-360,360), random(-360,360), bullet));
  }
  projListC =  new ArrayList<Proj>();
    for(int i = 0; i < projCount; i++){
-   projListC.add(new Proj(tCX, tCY, random(-360,360), random(-360,360), bullet));
+   projListC.add(new Proj(tC.x, tC.y, random(-360,360), random(-360,360), bullet));
  }
  projListD =  new ArrayList<Proj>();
    for(int i = 0; i < projCount; i++){
-   projListD.add(new Proj(tDX, tDY, random(-360,360), random(-360,360), bullet));
+   projListD.add(new Proj(tD.x, tD.y, random(-360,360), random(-360,360), bullet));
  }
     hp = (int)(6/(difficulty + 1));
     mill = millis();
@@ -101,22 +106,28 @@ void state2(){
   main.pdisplay();
   fill(255);
   textSize(50);
-  currentText = "* One day there will be a game here..";
-  textDisplay(currentText);
   
-    
-  moveProjectile();
+ tA = TA.getPos();
+
+ tB = TB.getPos();
+ 
+ tC = TC.getPos();
+ 
+ tD = TD.getPos();
+  if(time > 1){
+  moveProjectile();}
   moveMain();
+  moveTurret();
   game = loadImage("game.png");
   image(game, 0, 0, 800, 1000);
   fill(0);
   textSize(75);
   text(hp, 400,120);
   text(endGame - time, 668,120);
-  if(time % 5 == 0 && reset == true){
+  if(time % 3 == 0 && reset == true){
     resetProjectile();
   }
-  if((time - 1) % 5 == 0){
+  if((time - 1) % 3 == 0){
     reset = true;
   }
   
@@ -125,28 +136,52 @@ void state2(){
     gameState = 3;
   }
 }
+PVector getMainPos(){
+  return main.getPos();
+}
+void reduceHp(){
+  hp--;
+}
+void moveTurret(){
+  TA.tdisplay();
+  TA.movet();
+  TA.bounce();
+  
+  TB.tdisplay();
+  TB.movet();
+  TB.bounce();
+  
+  TC.tdisplay();
+  TC.movet();
+  TC.bounce();
+  
+  TD.tdisplay();
+  TD.movet();
+  TD.bounce();
+}
 void resetProjectile(){
+  reset = false;
   for (Proj p : projListA) {
-    p.forcemove(tAX, tAY);
+    p.forcemove(tA.x, tA.y);
     PVector force = new PVector(random(-360,360), random(-360,360));
     p.applyForce(force);
   }
   for (Proj p : projListB) {
-    p.forcemove(tBX, tBY);
+    p.forcemove(tB.x, tB.y);
     PVector force = new PVector(random(-360,360), random(-360,360));
     p.applyForce(force);
   }
   for (Proj p : projListC) {
-    p.forcemove(tCX, tCY);
+    p.forcemove(tC.x, tC.y);
     PVector force = new PVector(random(-360,360), random(-360,360));
     p.applyForce(force);
   }
   for (Proj p : projListD) {
-    p.forcemove(tDX, tDY);
+    p.forcemove(tD.x, tD.y);
     PVector force = new PVector(random(-360,360), random(-360,360));
     p.applyForce(force);
   }
-  reset = false;
+  
 }
 void moveMain(){
   main.move();
@@ -160,26 +195,18 @@ void moveProjectile(){
   for (Proj p : projListA) {
     p.move();
     p.display();
-    //PVector force = new PVector(random(0.6, 1), -0.4);
-    //p.applyForce(force);
   }
  for (Proj p : projListB) {
     p.move();
     p.display();
-    //PVector force = new PVector(random(-0.6, -1), 0.4);
-    //p.applyForce(force);
   }
   for (Proj p : projListC) {
     p.move();
     p.display();
-    //PVector force = new PVector(random(0.6, 1), 0.4);
-    //p.applyForce(force);
   }
  for (Proj p : projListD) {
     p.move();
     p.display();
-    //PVector force = new PVector(random(-0.6, -1), 0.4);
-    //p.applyForce(force);
   }
 }
 void textDisplay(String e){

@@ -9,7 +9,7 @@ class Proj {
   Gif sprit;
   float mass;
   ArrayList<PVector> forces = new ArrayList<PVector>();
-
+  boolean damage;
   Proj(float x, float y, float xVel, float yVel, Gif i) {
     location = new PVector(x, y);
     velocity = new PVector(xVel, yVel);
@@ -28,6 +28,9 @@ class Proj {
     if(i == 2){
       sprite = loadImage("frog.png");
     }
+    if(i == 3){
+      sprite = loadImage("turretA.png");
+    }
     location = new PVector(x, y);
     velocity = new PVector(xVel, yVel);
     acceleration = new PVector(0, 0);
@@ -45,12 +48,30 @@ class Proj {
     velocity.add(acceleration);
     acceleration = new PVector(0, 0);
     velocity.limit(limit); 
+    PVector mainpos = getMainPos();
+    if((location.x >= mainpos.x - 60) && (location.x <= mainpos.x + 60)&&
+    (location.y >= mainpos.y - 60) && (location.y <= mainpos.y + 60)){
+      if(damage == true){
+        reduceHp();
+        background(200);
+      }
+      damage = false;
+    }
+    else{
+      damage = true;
+    }
   }
   void movenolim() {
     location.add(velocity);
     velocity.add(acceleration);
     acceleration = new PVector(0, 0);
     velocity.limit(10); 
+  }
+  void movet() {
+    location.add(velocity);
+    velocity.add(acceleration);
+    acceleration = new PVector(0, 0);
+    velocity.limit(2); 
   }
   void setLimit(int i){
     limit = i;
@@ -64,22 +85,24 @@ class Proj {
     if (location.x >= 700) {
       velocity.x = (velocity.x + 1) * -1;
     }
-    if (location.y >= 800) {
+    if (location.y >= 900) {
       velocity.y = (velocity.y + 1) * -1;
     }
-    if (location.y <= 160) {
+    if (location.y <= 100) {
       velocity.y = (velocity.y - 1) * -1;
     }
   }
-
+  
   void applyForce(PVector force) {
     acceleration.add(force.div(mass));
   }
  
   void pdisplay(){
-    image(sprite, location.x, location.y, 90, 90);
+    image(sprite, location.x, location.y, 125, 125);
   }
-
+  void tdisplay(){
+    image(sprite, location.x, location.y, 80, 80);
+  }
   void display() {
     stroke(1);
     strokeWeight(2);
