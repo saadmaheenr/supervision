@@ -20,13 +20,13 @@ class Proj {
   }
   Proj(float x, float y, float xVel, float yVel, int i) {
     if(i == 0){
-      sprite = loadImage("bubble.png");
+      sprite = loadImage("bubbleshroom.png");
     }
     if(i == 1){
-      sprite = loadImage("bunny.png");
+      sprite = loadImage("bubblebun.png");
     }
     if(i == 2){
-      sprite = loadImage("frog.png");
+      sprite = loadImage("bubbleall.png");
     }
     if(i == 3){
       sprite = loadImage("turretA.png");

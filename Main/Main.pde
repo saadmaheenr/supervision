@@ -3,7 +3,7 @@ int gameState;
 int hp;
 Proj main;
 PFont font;
-String currentText;
+String currentText = "";
 boolean letGo;
 boolean letGoKey;
 ArrayList<Proj> projListA;
@@ -21,21 +21,23 @@ PVector tD;
 Gif bullet;
 int difficulty = 1;
 String[] diff = {"Easy", "Normal", "Hard"};
+int[] events = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 int parry = 5;
 double mill = 0;
 int time = 0; 
 int startTime = 0;
-int[] ends = {60, 300, 600, 1200};
+int[] ends = {60, 120, 180, 300};
 int endTime = 1;
 int endGame;
 int projCount;
 PImage title;
 PImage titlebg;
+PImage button;
 boolean run2 = true;
-boolean takedmg = true;
 boolean reset = true;
-
-String[] names = {"Shroom", "Bunny", "Frog"};
+boolean par = true;
+boolean enabledmg = true;
+String[] names = {"Shroom", "Bunny", "Allay"};
 int player; //0-2
 //PImage[] playerState
 PImage game;
@@ -64,7 +66,6 @@ void draw(){
     state0(); 
   }
   else if(gameState == 1){
-   background(49);
    state1();
   }
   else if(gameState == 2){
@@ -89,7 +90,7 @@ void draw(){
    for(int i = 0; i < projCount; i++){
    projListD.add(new Proj(tD.x, tD.y, random(-360,360), random(-360,360), bullet));
  }
-    hp = (int)(6/(difficulty + 1));
+    hp = (int)(10/(difficulty + 1));
     mill = millis();
     endGame = ends[endTime];
     run2 = false;
@@ -98,6 +99,9 @@ void draw(){
   }
   else if(gameState == 3){
     state3();
+  }
+  else if(gameState == 4){
+    state4();
   }
 }
 
@@ -121,6 +125,43 @@ void state2(){
   moveProjectile();}
   moveMain();
   moveTurret();
+  /* Events:
+  0: Projectile speed increase
+  1: Spawn homing projectiles
+  2: Laser comes down on 1 of 3 columns
+  3: Extra parries
+  4: Wind pushes player in a random direction
+  */
+  if(time % 20 == 0){
+    
+  }
+  if(mousePressed && mouseButton == LEFT && par == true){
+    if(parry <= 0){
+      currentText = "* No charges!";}
+      else{
+    par = false;
+    parry--;
+    background(125);
+    for (Proj p : projListA) {
+    PVector force = new PVector(random(-2,2), -10);
+    p.applyForce(force);
+  }
+  for (Proj p : projListB) {
+    PVector force = new PVector(random(-2,2), 10);
+    p.applyForce(force);
+  }
+  for (Proj p : projListC) {
+    PVector force = new PVector(10, random(-2,2));
+    p.applyForce(force);
+  }
+  for (Proj p : projListD) {
+    PVector force = new PVector(-10, random(-2,2));
+    p.applyForce(force);
+  }
+     }}
+     if(!mousePressed){
+       par = true;
+     }
   
   game = loadImage("game.png");
   image(game, 0, 0, 800, 1000);
@@ -129,6 +170,7 @@ void state2(){
   text(hp, 400,120);
   text(parry, 550,120);
   text(endGame - time, 668,120);
+  textDisplay();
   if((time + 1) % 3 == 0){
     TA.changetB();
     TB.changetB();
@@ -150,12 +192,16 @@ void state2(){
   if(time == endGame){
     gameState = 3;
   }
+  if(hp <= 0){
+    gameState = 4;
+  }
 }
 PVector getMainPos(){
   return main.getPos();
 }
 void reduceHp(){
-  hp--;
+  if(enabledmg == true){
+  hp--;}
 }
 void moveTurret(){
   TA.tdisplay();
@@ -224,12 +270,20 @@ void moveProjectile(){
     p.display();
   }
 }
-void textDisplay(String e){
-
-  text(e, 20, 970);
-
+void textDisplay(){
+  fill(240);
+  textSize(50);
+  text(currentText, 20, 970);
 }
 
+
+void state3(){
+  
+}
+
+void state4(){
+  
+}
 
 void state0(){
   int pos = 100;
@@ -246,25 +300,23 @@ void state0(){
 }
 
 void state1(){
-  fill(255);
-  text(names[player], 100,80);
-  rect(100, 100, 400, 100);
+  int pos = 100;
+  title = loadImage("title.png");
+  titlebg = loadImage("titlebg.png");
+  textSize(75);
+  image(titlebg, 0, 0);
+  image(title,200, pos);//Title
   fill(0);
-  text("Select Difficulty", 120,150);
-  fill(255);
-  text(diff[difficulty], 550,150);
-  rect(100, 250, 400, 100);
-  fill(0);
-  text("Select Time", 120, 300);
-  fill(255);
-  text(ends[endTime]/60 + " minutes", 550, 300);
-  rect(100, 400, 400, 100);
-  fill(0);
-  text("Start", 120,450);
-  fill(255);
+  button = loadImage("button.png");
+  image(button, 220, 440, 350, 140);
+  text(diff[difficulty], 260, 530);
+  image(button, 220, 650, 350, 140);
+  text(ends[endTime]/60 + " minutes", 260, 740);
+ 
+  text("START", 260, 900);
   
   if(mousePressed && mouseButton == LEFT && letGo == true){
-    if(over(100, 100, 400, 100)){
+    if(over(220, 440, 350, 140)){
       if(difficulty == 2){
         difficulty = 0;
       }
@@ -272,7 +324,7 @@ void state1(){
       difficulty++;
       }
     }
-    if(over(100, 250, 400, 100)){
+    if(over(220, 650, 350, 140)){
       if(endTime == 3){
         endTime = 0;
       }
@@ -280,7 +332,7 @@ void state1(){
       endTime++;
       }
     }
-    if(over(100, 400, 400, 100)){
+    if(over(220, 900, 350, 140)){
       gameState = 2;
     }
     letGo = false;
@@ -304,10 +356,6 @@ void state1(){
   
 }
 
-
-void state3(){
-  
-}
 
 
 boolean over(float x, float y, float setw, float seth)  {
