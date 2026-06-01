@@ -8,7 +8,7 @@ class Proj {
   Gif sprit;
   float mass;
   ArrayList<PVector> forces = new ArrayList<PVector>();
-
+  boolean damage;
   Proj(float x, float y, float xVel, float yVel, Gif i) {
     location = new PVector(x, y);
     velocity = new PVector(xVel, yVel);
@@ -19,13 +19,13 @@ class Proj {
   }
   Proj(float x, float y, float xVel, float yVel, int i) {
     if(i == 0){
-      sprite = loadImage("bubble.png");
+      sprite = loadImage("bubblebun.png");
     }
     if(i == 1){
-      sprite = loadImage("bunny.png");
+      sprite = loadImage("bubbleall.png");
     }
-    if(i == 2){
-      sprite = loadImage("frog.png");
+    if(i == 3){
+      sprite = loadImage("turretA.png");
     }
     location = new PVector(x, y);
     velocity = new PVector(xVel, yVel);
@@ -33,7 +33,9 @@ class Proj {
     c = 200;
     mass = 4;
   }
-
+  PVector getPos(){
+    return location;
+  }
   void forcemove(float x, float y){
     location = new PVector(x, y);
   }
@@ -41,34 +43,65 @@ class Proj {
     location.add(velocity);
     velocity.add(acceleration);
     acceleration = new PVector(0, 0);
-    velocity.limit(10); 
+    velocity.limit(limit); 
+    PVector mainpos = getMainPos();
+    if((location.x >= mainpos.x - 50) && (location.x <= mainpos.x + 50)&&
+    (location.y >= mainpos.y - 50) && (location.y <= mainpos.y + 50)){
+      if(damage == true){
+        reduceHp();
+        background(200);
+      }
+      damage = false;
+    }
+    else{
+      damage = true;
+    }
   }
-
+  void movenolim() {
+    location.add(velocity);
+    velocity.add(acceleration);
+    acceleration = new PVector(0, 0);
+    velocity.limit(7); 
+  }
+  void movet() {
+    location.add(velocity);
+    velocity.add(acceleration);
+    acceleration = new PVector(0, 0);
+    velocity.limit(2); 
+  }
+  
   void bounce() {
     // Update your bounce code to use vectors
     if (location.x <= 0) {
-      velocity.x = (velocity.x - 3) * -1;
+      velocity.x = (velocity.x - 1) * -1;
       forcemove(1, location.y);
     }
-    if (location.x >= 600) {
-      velocity.x = (velocity.x + 3) * -1;
+    if (location.x >= 700) {
+      velocity.x = (velocity.x + 1) * -1;
     }
-    if (location.y >= 800) {
-      velocity.y = (velocity.y + 3) * -1;
+    if (location.y >= 900) {
+      velocity.y = (velocity.y + 1) * -1;
     }
-    if (location.y <= 160) {
-      velocity.y = (velocity.y - 3) * -1;
+    if (location.y <= 100) {
+      velocity.y = (velocity.y - 1) * -1;
     }
   }
-
+  
   void applyForce(PVector force) {
     acceleration.add(force.div(mass));
   }
- 
-  void pdisplay(){
-    image(sprite, location.x, location.y, 200, 200);
+  void changetA(){
+    sprite = loadImage("turretA.png");
   }
-
+  void changetB(){
+    sprite = loadImage("turretB.png");
+  }
+  void pdisplay(){
+    image(sprite, location.x, location.y, 125, 125);
+  }
+  void tdisplay(){
+    image(sprite, location.x, location.y, 80, 80);
+  }
   void display() {
     stroke(1);
     strokeWeight(2);

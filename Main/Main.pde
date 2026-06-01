@@ -1,37 +1,58 @@
+// Design Document https://docs.google.com/document/d/1q6pcNHOzePtnTnFkWSbN_ncsATD2z56XCs1AGmRwTWg/edit?usp=sharing
 import gifAnimation.*;
+import processing.sound.*;
 int gameState;
 int hp;
 Proj main;
 PFont font;
-String currentText;
+SoundFile buster;
+SoundFile hit;
+SoundFile parr;
+SoundFile victory;
+SoundFile loss;
+int rande;
+String currentText = "";
 boolean letGo;
 boolean letGoKey;
 ArrayList<Proj> projListA;
+Proj TA;
+PVector tA;
 ArrayList<Proj> projListB;
+Proj TB;
+PVector tB;
+ArrayList<Proj> projListC;
+Proj TC;
+PVector tC;
+ArrayList<Proj> projListD;
+Proj TD;
+PVector tD;
+int c = 0;
 Gif bullet;
+Gif bunnyend;
+Gif allayend;
 int difficulty = 1;
 String[] diff = {"Easy", "Normal", "Hard"};
-
+int parry = 5;
 double mill = 0;
 int time = 0; 
 int startTime = 0;
-int[] ends = {60, 300, 600, 1200};
+int[] ends = {2, 120, 180, 300};
 int endTime = 1;
 int endGame;
+int projCount;
 PImage title;
-float r1 = 0;
-float r2 = 0;
-float r1max = 0.3;
-float r2max =0.3;
-    
+PImage titlebg;
+PImage button;
 boolean run2 = true;
-boolean runtext = true;
 boolean reset = true;
-
-String[] names = {"Shroom", "Bunny", "Frog"};
+boolean par = true;
+boolean bounce = false;
+boolean setrandom;
+String[] names = {"Bunny", "Allay"};
 int player; //0-2
 //PImage[] playerState
 PImage game;
+PImage gamebg;
 
 // 0 = Title
 // 1 = Settings
@@ -39,34 +60,63 @@ PImage game;
 // 3 = Ending
 void setup(){
  size(800, 1000);
+ buster = new SoundFile(this, "buster.wav");
+ hit = new SoundFile(this, "hit.wav");
+ parr = new SoundFile(this, "parry.wav");
+ 
+ victory = new SoundFile(this, "victory.mp3");
+ loss = new SoundFile(this, "loss.mp3");
  
  bullet = new Gif(this, "bullet.gif");
- 
- 
+ bunnyend = new Gif(this, "bunnyend.gif");
+ bunnyend.loop();
+ allayend = new Gif(this, "allayend.gif");
+ allayend.loop();
  font = createFont("ByteBounce.ttf",  50);
  textFont(font);
- projListA =  new ArrayList<Proj>();
-   for(int i = 0; i < 3; i++){
-   projListA.add(new Proj(0, 400, random(3), random(3), bullet));
- }
- projListB =  new ArrayList<Proj>();
-   for(int i = 0; i < 3; i++){
-   projListB.add(new Proj(800, 400, random(3), random(3), bullet));
- }
+ TA = new Proj(100, 400, 20, 2, 3);
+ tA = TA.getPos();
+ TB = new Proj(400, 300, -1, -1, 3);
+ tB = TB.getPos();
+ TC = new Proj(200, 500, 3, -2, 3);
+ tC = TC.getPos();
+ TD = new Proj(500, 600, -2, 1, 3);
+ tD = TD.getPos();
 }
+static int limit= 7;
+static void setLimit(int i){
+    limit = i;
+  }
 void draw(){
   if(gameState == 0){
     state0(); 
   }
   else if(gameState == 1){
-   background(49);
    state1();
   }
   else if(gameState == 2){
     if(run2 == true){
     background(49);
     main = new Proj(400, 400, 0, 0, player);
-    hp = (int)(6/(difficulty + 1));
+    projCount = difficulty + 1;
+    projListA =  new ArrayList<Proj>();
+    
+   for(int i = 0; i < projCount; i++){
+   projListA.add(new Proj(tA.x, tA.y, random(-360,360), random(-360,360), bullet));
+ }
+ projListB =  new ArrayList<Proj>();
+   for(int i = 0; i < projCount; i++){
+   projListB.add(new Proj(tB.x, tB.y, random(-360,360), random(-360,360), bullet));
+ }
+ projListC =  new ArrayList<Proj>();
+   for(int i = 0; i < projCount; i++){
+   projListC.add(new Proj(tC.x, tC.y, random(-360,360), random(-360,360), bullet));
+ }
+ projListD =  new ArrayList<Proj>();
+   for(int i = 0; i < projCount; i++){
+   projListD.add(new Proj(tD.x, tD.y, random(-360,360), random(-360,360), bullet));
+ }
+    hp = (int)(20/(difficulty + 1));
     mill = millis();
     endGame = ends[endTime];
     run2 = false;
@@ -76,122 +126,287 @@ void draw(){
   else if(gameState == 3){
     state3();
   }
+  else if(gameState == 4){
+    state4();
+  }
 }
 
 void state2(){
   background(35);
   time = (int)((millis() - mill)/1000);
+  gamebg = loadImage("gamebg.png");
+  image(gamebg, 0, 0);
   main.pdisplay();
   fill(255);
   textSize(50);
-  currentText = "* One day there will be a game here..";
-  textDisplay(currentText);
-  //if (mousePressed && mouseButton == LEFT){
-     // PVector wind = new PVector(0.2, 0);
-   // b.applyForce((wind));
-   // }
-    
-  moveProjectile();
+  
+ tA = TA.getPos();
+
+ tB = TB.getPos();
+ 
+ tC = TC.getPos();
+ 
+ tD = TD.getPos();
+  if(time >= 3){
+  moveProjectile();}
   moveMain();
-  game = loadImage("game.png");
-  image(game, 0, 0, 800, 1000);
-  fill(0);
-  textSize(75);
-  text(hp, 400,120);
-  text(endGame - time, 668,120);
-  if(time % 5 == 0 && reset == true){
-    resetProjectile();
+  moveTurret();
+  /* Events:
+  0: Projectile speed increase
+  1: Laser comes down on 1 of 3 columns
+  2: Extra parries
+  3: Wind pushes player in a random direction
+  4: Hud dissapears
+  5: Lucky lucky
+  */
+
+  if(time % 20 == 0 && time != 0){
+    setLimit(7);
+    bounce = false;
+    c = 0;
+    if(rande == 0){
+     setLimit(12);
+     currentText = "Zooom!";
+    }
+    if(rande == 1){
+      bounce = true;
+      currentText = "Boing";
+    }
+    if(rande == 2){
+      parry = 8; 
+      currentText = "Ding ding!";
+      rande = 9;
+    }
+    if(rande == 3){
+      c = 255;
+      currentText = "Where'd everything go?";
+    }
+    if(rande > 3 && rande < 9){
+      currentText = "Keep going..";
+    }
+    
   }
-  if((time - 1) % 5 == 0){
-    reset = true;
+  else{
+    rande = (int)(random(6));
   }
-  if(time == endGame){
-    gameState = 3;
-  }
-}
-void resetProjectile(){
-  for (Proj p : projListA) {
-    p.forcemove(0, 400);
-    PVector force = new PVector(random(2), 20);
+  if(mousePressed && mouseButton == LEFT && par == true){
+    if(parry <= 0){
+      currentText = "* No charges!";}
+      else{
+        parr.play();
+    par = false;
+    parry--;
+    background(125);
+    for (Proj p : projListA) {
+    PVector force = new PVector(random(-2,2), -10);
     p.applyForce(force);
   }
   for (Proj p : projListB) {
-    p.forcemove(800, 400);
-    PVector force = new PVector(random(2), 20);
+    PVector force = new PVector(random(-2,2), 10);
     p.applyForce(force);
   }
+  for (Proj p : projListC) {
+    PVector force = new PVector(10, random(-2,2));
+    p.applyForce(force);
+  }
+  for (Proj p : projListD) {
+    PVector force = new PVector(-10, random(-2,2));
+    p.applyForce(force);
+  }
+     }}
+     if(!mousePressed){
+       par = true;
+     }
+  
+  game = loadImage("game.png");
+  image(game, 0, 0, 800, 1000);
+  fill(c);
+  textSize(75);
+  text(names[player], 50,75);
+  text(hp, 400,120);
+  text(parry, 550,120);
+  text(endGame - time, 668,120);
+  textDisplay();
+  if((time + 1) % 3 == 0){
+    TA.changetB();
+    TB.changetB();
+    TC.changetB();
+    TD.changetB();
+  }
+  if(time % 3 == 0 && reset == true){
+    resetProjectile();
+    buster.play();
+  }
+  if((time - 1) % 3 == 0){
+    TA.changetA();
+    TB.changetA();
+    TC.changetA();
+    TD.changetA();
+    reset = true;
+  }
+  
+  
+  if(time == endGame){
+    victory.play();
+    gameState = 3;
+  }
+  if(hp <= 0){
+    loss.play();
+    gameState = 4;
+  }
+}
+PVector getMainPos(){
+  return main.getPos();
+}
+void reduceHp(){
+  hp--;
+  hit.play();
+}
+
+void moveTurret(){
+  TA.tdisplay();
+  TA.movet();
+  TA.bounce();
+  
+  TB.tdisplay();
+  TB.movet();
+  TB.bounce();
+  
+  TC.tdisplay();
+  TC.movet();
+  TC.bounce();
+  
+  TD.tdisplay();
+  TD.movet();
+  TD.bounce();
+}
+void resetProjectile(){
   reset = false;
+  for (Proj p : projListA) {
+    p.forcemove(tA.x, tA.y);
+    PVector force = new PVector(random(-360,360), random(-360,360));
+    p.applyForce(force);
+  }
+  for (Proj p : projListB) {
+    p.forcemove(tB.x, tB.y);
+    PVector force = new PVector(random(-360,360), random(-360,360));
+    p.applyForce(force);
+  }
+  for (Proj p : projListC) {
+    p.forcemove(tC.x, tC.y);
+    PVector force = new PVector(random(-360,360), random(-360,360));
+    p.applyForce(force);
+  }
+  for (Proj p : projListD) {
+    p.forcemove(tD.x, tD.y);
+    PVector force = new PVector(random(-360,360), random(-360,360));
+    p.applyForce(force);
+  }
+  
 }
 void moveMain(){
-  main.move();
+  main.movenolim();
   main.bounce();
-  PVector random = new PVector(r1, r2);
-  main.applyForce(random);
-  if(random(10) < 1){
-    r1 = random(-1 * r1max, r1max);
-    r2 = random(-1 * r2max, r2max);
-  }
+  PVector pos = main.getPos();
+  PVector force = new PVector((mouseX - pos.x)/40, (mouseY - pos.y)/40);
+  main.applyForce(force);
+  
 }
 void moveProjectile(){
   for (Proj p : projListA) {
     p.move();
-    
+    if(bounce){ p.bounce();}
     p.display();
-    PVector force = new PVector(1, -0.4);
-    p.applyForce(force);
   }
  for (Proj p : projListB) {
     p.move();
-    
+    if(bounce){ p.bounce();}
     p.display();
-    PVector force = new PVector(-1, 0.4);
-    p.applyForce(force);
+  }
+  for (Proj p : projListC) {
+    p.move();
+    if(bounce){ p.bounce();}
+    p.display();
+  }
+ for (Proj p : projListD) {
+    p.move();
+    if(bounce){ p.bounce();}
+    p.display();
   }
 }
-void textDisplay(String e){
-
-  text(e, 20, 970);
-
+void textDisplay(){
+  fill(240);
+  textSize(50);
+  text(currentText, 20, 970);
 }
 
+
+void state3(){
+  image(titlebg, 0, 0, 800, 1000);
+  game = loadImage("game.png");
+  image(game, 0, 0, 800, 1000);
+  fill(0);
+  textSize(75);
+  text(names[player], 50,75);
+  text(hp, 400,120);
+  text(parry, 550,120);
+  text(0, 668,120);
+  textSize(200);
+  if(player == 0){
+  image(bunnyend, 260, 400);}
+  else{
+    image(allayend, 260, 400);
+  }
+  text("END :)", 230,900);
+}
+
+void state4(){
+  image(gamebg, 0, 0, 800, 1000);
+  game = loadImage("game.png");
+  image(game, 0, 0, 800, 1000);
+  fill(0);
+  textSize(75);
+  text(names[player], 50,75);
+  text(0, 400,120);
+  text(parry, 550,120);
+  text(endGame - time, 680,120);
+  fill(255);
+  textSize(200);
+  text("END ):", 230,900);
+}
 
 void state0(){
   int pos = 100;
   title = loadImage("title.png");
+  titlebg = loadImage("titlebg.png");
+  image(titlebg, 0, 0);
   image(title,200, pos);//Title
   fill(0);
   text("press any key", 260,500);
   if(keyPressed){
     gameState = 1;
   }
-  if(pos == 100 && random(1) > 0){
-    pos+= 10;
-  }
-  if(pos == 110 && random(1) > 0){
-    pos -= 10;
-  }
+  
 }
 
 void state1(){
-  fill(255);
-  text(names[player], 100,80);
-  rect(100, 100, 400, 100);
+  int pos = 100;
+  title = loadImage("title.png");
+  titlebg = loadImage("titlebg.png");
+  textSize(75);
+  image(titlebg, 0, 0);
+  image(title,200, pos);//Title
   fill(0);
-  text("Select Difficulty", 120,150);
-  fill(255);
-  text(diff[difficulty], 550,150);
-  rect(100, 250, 400, 100);
-  fill(0);
-  text("Select Time", 120, 300);
-  fill(255);
-  text(ends[endTime]/60 + " minutes", 550, 300);
-  rect(100, 400, 400, 100);
-  fill(0);
-  text("Start", 120,450);
-  fill(255);
+  button = loadImage("button.png");
+  image(button, 220, 440, 350, 140);
+  text(diff[difficulty], 260, 530);
+  image(button, 220, 650, 350, 140);
+  text(ends[endTime]/60 + " minutes", 260, 740);
+ 
+  text("START: " + names[player], 220, 900);
   
   if(mousePressed && mouseButton == LEFT && letGo == true){
-    if(over(100, 100, 400, 100)){
+    if(over(220, 440, 350, 140)){
       if(difficulty == 2){
         difficulty = 0;
       }
@@ -199,7 +414,7 @@ void state1(){
       difficulty++;
       }
     }
-    if(over(100, 250, 400, 100)){
+    if(over(220, 650, 350, 140)){
       if(endTime == 3){
         endTime = 0;
       }
@@ -207,7 +422,7 @@ void state1(){
       endTime++;
       }
     }
-    if(over(100, 400, 400, 100)){
+    if(over(220, 800, 350, 140)){
       gameState = 2;
     }
     letGo = false;
@@ -216,7 +431,7 @@ void state1(){
     letGo = true;
   }
   if(keyPressed && letGoKey){
-    if(player == 2){
+    if(player == 1){
         player = 0;
       }
       else{
@@ -232,12 +447,8 @@ void state1(){
 }
 
 
-void state3(){
-  
-}
 
-
-boolean over(int x, int y, int setw, int seth)  {
+boolean over(float x, float y, float setw, float seth)  {
     if (mouseX >= x && mouseX <= x+setw && 
         mouseY >= y && mouseY <= y+seth) {
       return true;
@@ -245,3 +456,4 @@ boolean over(int x, int y, int setw, int seth)  {
     return false;
     }
   }
+  
