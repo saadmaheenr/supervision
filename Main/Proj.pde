@@ -5,6 +5,7 @@ class Proj {
   PVector acceleration;
   PImage sprite;
   color c;
+  int limit= 10;
   Gif sprit;
   float mass;
   ArrayList<PVector> forces = new ArrayList<PVector>();
@@ -33,7 +34,9 @@ class Proj {
     c = 200;
     mass = 4;
   }
-
+  PVector getPos(){
+    return location;
+  }
   void forcemove(float x, float y){
     location = new PVector(x, y);
   }
@@ -41,23 +44,31 @@ class Proj {
     location.add(velocity);
     velocity.add(acceleration);
     acceleration = new PVector(0, 0);
+    velocity.limit(limit); 
+  }
+  void movenolim() {
+    location.add(velocity);
+    velocity.add(acceleration);
+    acceleration = new PVector(0, 0);
     velocity.limit(10); 
   }
-
+  void setLimit(int i){
+    limit = i;
+  }
   void bounce() {
     // Update your bounce code to use vectors
     if (location.x <= 0) {
-      velocity.x = (velocity.x - 3) * -1;
+      velocity.x = (velocity.x - 1) * -1;
       forcemove(1, location.y);
     }
     if (location.x >= 600) {
-      velocity.x = (velocity.x + 3) * -1;
+      velocity.x = (velocity.x + 1) * -1;
     }
     if (location.y >= 800) {
-      velocity.y = (velocity.y + 3) * -1;
+      velocity.y = (velocity.y + 1) * -1;
     }
     if (location.y <= 160) {
-      velocity.y = (velocity.y - 3) * -1;
+      velocity.y = (velocity.y - 1) * -1;
     }
   }
 

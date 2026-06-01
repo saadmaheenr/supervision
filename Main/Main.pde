@@ -19,11 +19,7 @@ int[] ends = {60, 300, 600, 1200};
 int endTime = 1;
 int endGame;
 PImage title;
-float r1 = 0;
-float r2 = 0;
-float r1max = 0.3;
-float r2max =0.3;
-    
+
 boolean run2 = true;
 boolean runtext = true;
 boolean reset = true;
@@ -47,11 +43,11 @@ void setup(){
  textFont(font);
  projListA =  new ArrayList<Proj>();
    for(int i = 0; i < 3; i++){
-   projListA.add(new Proj(0, 400, random(3), random(3), bullet));
+   projListA.add(new Proj(0, 400, random(20), random(20), bullet));
  }
  projListB =  new ArrayList<Proj>();
    for(int i = 0; i < 3; i++){
-   projListB.add(new Proj(800, 400, random(3), random(3), bullet));
+   projListB.add(new Proj(800, 400, random(20), random(20), bullet));
  }
 }
 void draw(){
@@ -86,10 +82,7 @@ void state2(){
   textSize(50);
   currentText = "* One day there will be a game here..";
   textDisplay(currentText);
-  //if (mousePressed && mouseButton == LEFT){
-     // PVector wind = new PVector(0.2, 0);
-   // b.applyForce((wind));
-   // }
+  
     
   moveProjectile();
   moveMain();
@@ -112,12 +105,12 @@ void state2(){
 void resetProjectile(){
   for (Proj p : projListA) {
     p.forcemove(0, 400);
-    PVector force = new PVector(random(2), 20);
+    PVector force = new PVector(random(20), random(20));
     p.applyForce(force);
   }
   for (Proj p : projListB) {
     p.forcemove(800, 400);
-    PVector force = new PVector(random(2), 20);
+    PVector force = new PVector(random(20), random(20));
     p.applyForce(force);
   }
   reset = false;
@@ -125,26 +118,23 @@ void resetProjectile(){
 void moveMain(){
   main.move();
   main.bounce();
-  PVector random = new PVector(r1, r2);
-  main.applyForce(random);
-  if(random(10) < 1){
-    r1 = random(-1 * r1max, r1max);
-    r2 = random(-1 * r2max, r2max);
-  }
+  PVector pos = main.getPos();
+  PVector force = new PVector((mouseX - pos.x)/100, (mouseY - pos.y)/100);
+  main.applyForce(force);
 }
 void moveProjectile(){
   for (Proj p : projListA) {
     p.move();
     
     p.display();
-    PVector force = new PVector(1, -0.4);
+    PVector force = new PVector(random(0.6, 1), -0.4);
     p.applyForce(force);
   }
  for (Proj p : projListB) {
     p.move();
     
     p.display();
-    PVector force = new PVector(-1, 0.4);
+    PVector force = new PVector(random(-0.6, -1), 0.4);
     p.applyForce(force);
   }
 }
@@ -240,6 +230,15 @@ void state3(){
 boolean over(int x, int y, int setw, int seth)  {
     if (mouseX >= x && mouseX <= x+setw && 
         mouseY >= y && mouseY <= y+seth) {
+      return true;
+  } else {
+    return false;
+    }
+  }
+  
+boolean overL(float x, float y)  { //overLenient
+    if (mouseX >= x-12 && mouseX <= x+12 && 
+        mouseY >= y-12 && mouseY <= y+12) {
       return true;
   } else {
     return false;
