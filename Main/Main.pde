@@ -1,9 +1,15 @@
 // Design Document https://docs.google.com/document/d/1q6pcNHOzePtnTnFkWSbN_ncsATD2z56XCs1AGmRwTWg/edit?usp=sharing
 import gifAnimation.*;
+import processing.sound.*;
 int gameState;
 int hp;
 Proj main;
 PFont font;
+SoundFile buster;
+SoundFile hit;
+SoundFile parr;
+SoundFile victory;
+SoundFile loss;
 int rande;
 String currentText = "";
 boolean letGo;
@@ -54,6 +60,13 @@ PImage gamebg;
 // 3 = Ending
 void setup(){
  size(800, 1000);
+ buster = new SoundFile(this, "buster.wav");
+ hit = new SoundFile(this, "hit.wav");
+ parr = new SoundFile(this, "parry.wav");
+ 
+ victory = new SoundFile(this, "victory.mp3");
+ loss = new SoundFile(this, "loss.mp3");
+ 
  bullet = new Gif(this, "bullet.gif");
  bunnyend = new Gif(this, "bunnyend.gif");
  bunnyend.loop();
@@ -174,12 +187,13 @@ void state2(){
     
   }
   else{
-    rande = (int)(random(5));
+    rande = (int)(random(6));
   }
   if(mousePressed && mouseButton == LEFT && par == true){
     if(parry <= 0){
       currentText = "* No charges!";}
       else{
+        parr.play();
     par = false;
     parry--;
     background(125);
@@ -211,7 +225,7 @@ void state2(){
   text(names[player], 50,75);
   text(hp, 400,120);
   text(parry, 550,120);
-  text(endGame - time, 680,120);
+  text(endGame - time, 668,120);
   textDisplay();
   if((time + 1) % 3 == 0){
     TA.changetB();
@@ -221,6 +235,7 @@ void state2(){
   }
   if(time % 3 == 0 && reset == true){
     resetProjectile();
+    buster.play();
   }
   if((time - 1) % 3 == 0){
     TA.changetA();
@@ -232,9 +247,11 @@ void state2(){
   
   
   if(time == endGame){
+    victory.play();
     gameState = 3;
   }
   if(hp <= 0){
+    loss.play();
     gameState = 4;
   }
 }
@@ -243,10 +260,9 @@ PVector getMainPos(){
 }
 void reduceHp(){
   hp--;
+  hit.play();
 }
-void kill(){
-  hp = 0;
-}
+
 void moveTurret(){
   TA.tdisplay();
   TA.movet();
