@@ -5,7 +5,7 @@ class Proj {
   PVector acceleration;
   PImage sprite;
   color c;
-  int limit= 10;
+  int limit= 7;
   Gif sprit;
   float mass;
   ArrayList<PVector> forces = new ArrayList<PVector>();
@@ -61,7 +61,7 @@ class Proj {
       velocity.x = (velocity.x - 1) * -1;
       forcemove(1, location.y);
     }
-    if (location.x >= 600) {
+    if (location.x >= 700) {
       velocity.x = (velocity.x + 1) * -1;
     }
     if (location.y >= 800) {
@@ -77,7 +77,7 @@ class Proj {
   }
  
   void pdisplay(){
-    image(sprite, location.x, location.y, 200, 200);
+    image(sprite, location.x, location.y, 90, 90);
   }
 
   void display() {

@@ -7,7 +7,17 @@ String currentText;
 boolean letGo;
 boolean letGoKey;
 ArrayList<Proj> projListA;
+float tAX = 0;
+float tAY = 400;
 ArrayList<Proj> projListB;
+float tBX = 700;
+float tBY = 400;
+ArrayList<Proj> projListC;
+float tCX = 200;
+float tCY = 650;
+ArrayList<Proj> projListD;
+float tDX = 500;
+float tDY = 650;
 Gif bullet;
 int difficulty = 1;
 String[] diff = {"Easy", "Normal", "Hard"};
@@ -18,10 +28,11 @@ int startTime = 0;
 int[] ends = {60, 300, 600, 1200};
 int endTime = 1;
 int endGame;
+int projCount;
 PImage title;
 
 boolean run2 = true;
-boolean runtext = true;
+boolean takedmg = true;
 boolean reset = true;
 
 String[] names = {"Shroom", "Bunny", "Frog"};
@@ -41,14 +52,7 @@ void setup(){
  
  font = createFont("ByteBounce.ttf",  50);
  textFont(font);
- projListA =  new ArrayList<Proj>();
-   for(int i = 0; i < 3; i++){
-   projListA.add(new Proj(0, 400, random(20), random(20), bullet));
- }
- projListB =  new ArrayList<Proj>();
-   for(int i = 0; i < 3; i++){
-   projListB.add(new Proj(800, 400, random(20), random(20), bullet));
- }
+ 
 }
 void draw(){
   if(gameState == 0){
@@ -62,6 +66,23 @@ void draw(){
     if(run2 == true){
     background(49);
     main = new Proj(400, 400, 0, 0, player);
+    projCount = difficulty + 1;
+    projListA =  new ArrayList<Proj>();
+   for(int i = 0; i < projCount; i++){
+   projListA.add(new Proj(tAX, tAY, random(-360,360), random(-360,360), bullet));
+ }
+ projListB =  new ArrayList<Proj>();
+   for(int i = 0; i < projCount; i++){
+   projListB.add(new Proj(tBX, tBY, random(-360,360), random(-360,360), bullet));
+ }
+ projListC =  new ArrayList<Proj>();
+   for(int i = 0; i < projCount; i++){
+   projListC.add(new Proj(tCX, tCY, random(-360,360), random(-360,360), bullet));
+ }
+ projListD =  new ArrayList<Proj>();
+   for(int i = 0; i < projCount; i++){
+   projListD.add(new Proj(tDX, tDY, random(-360,360), random(-360,360), bullet));
+ }
     hp = (int)(6/(difficulty + 1));
     mill = millis();
     endGame = ends[endTime];
@@ -98,19 +119,31 @@ void state2(){
   if((time - 1) % 5 == 0){
     reset = true;
   }
+  
+  
   if(time == endGame){
     gameState = 3;
   }
 }
 void resetProjectile(){
   for (Proj p : projListA) {
-    p.forcemove(0, 400);
-    PVector force = new PVector(random(20), random(20));
+    p.forcemove(tAX, tAY);
+    PVector force = new PVector(random(-360,360), random(-360,360));
     p.applyForce(force);
   }
   for (Proj p : projListB) {
-    p.forcemove(800, 400);
-    PVector force = new PVector(random(20), random(20));
+    p.forcemove(tBX, tBY);
+    PVector force = new PVector(random(-360,360), random(-360,360));
+    p.applyForce(force);
+  }
+  for (Proj p : projListC) {
+    p.forcemove(tCX, tCY);
+    PVector force = new PVector(random(-360,360), random(-360,360));
+    p.applyForce(force);
+  }
+  for (Proj p : projListD) {
+    p.forcemove(tDX, tDY);
+    PVector force = new PVector(random(-360,360), random(-360,360));
     p.applyForce(force);
   }
   reset = false;
@@ -121,21 +154,32 @@ void moveMain(){
   PVector pos = main.getPos();
   PVector force = new PVector((mouseX - pos.x)/100, (mouseY - pos.y)/100);
   main.applyForce(force);
+  
 }
 void moveProjectile(){
   for (Proj p : projListA) {
     p.move();
-    
     p.display();
-    PVector force = new PVector(random(0.6, 1), -0.4);
-    p.applyForce(force);
+    //PVector force = new PVector(random(0.6, 1), -0.4);
+    //p.applyForce(force);
   }
  for (Proj p : projListB) {
     p.move();
-    
     p.display();
-    PVector force = new PVector(random(-0.6, -1), 0.4);
-    p.applyForce(force);
+    //PVector force = new PVector(random(-0.6, -1), 0.4);
+    //p.applyForce(force);
+  }
+  for (Proj p : projListC) {
+    p.move();
+    p.display();
+    //PVector force = new PVector(random(0.6, 1), 0.4);
+    //p.applyForce(force);
+  }
+ for (Proj p : projListD) {
+    p.move();
+    p.display();
+    //PVector force = new PVector(random(-0.6, -1), 0.4);
+    //p.applyForce(force);
   }
 }
 void textDisplay(String e){
@@ -227,7 +271,7 @@ void state3(){
 }
 
 
-boolean over(int x, int y, int setw, int seth)  {
+boolean over(float x, float y, float setw, float seth)  {
     if (mouseX >= x && mouseX <= x+setw && 
         mouseY >= y && mouseY <= y+seth) {
       return true;
@@ -236,11 +280,3 @@ boolean over(int x, int y, int setw, int seth)  {
     }
   }
   
-boolean overL(float x, float y)  { //overLenient
-    if (mouseX >= x-12 && mouseX <= x+12 && 
-        mouseY >= y-12 && mouseY <= y+12) {
-      return true;
-  } else {
-    return false;
-    }
-  }
