@@ -21,7 +21,7 @@ PVector tD;
 Gif bullet;
 int difficulty = 1;
 String[] diff = {"Easy", "Normal", "Hard"};
-
+int parry = 5;
 double mill = 0;
 int time = 0; 
 int startTime = 0;
@@ -30,7 +30,7 @@ int endTime = 1;
 int endGame;
 int projCount;
 PImage title;
-
+PImage titlebg;
 boolean run2 = true;
 boolean takedmg = true;
 boolean reset = true;
@@ -39,6 +39,7 @@ String[] names = {"Shroom", "Bunny", "Frog"};
 int player; //0-2
 //PImage[] playerState
 PImage game;
+PImage gamebg;
 
 // 0 = Title
 // 1 = Settings
@@ -103,6 +104,8 @@ void draw(){
 void state2(){
   background(35);
   time = (int)((millis() - mill)/1000);
+  gamebg = loadImage("gamebg.png");
+  image(gamebg, 0, 0);
   main.pdisplay();
   fill(255);
   textSize(50);
@@ -114,20 +117,32 @@ void state2(){
  tC = TC.getPos();
  
  tD = TD.getPos();
-  if(time > 1){
+  if(time >= 3){
   moveProjectile();}
   moveMain();
   moveTurret();
+  
   game = loadImage("game.png");
   image(game, 0, 0, 800, 1000);
   fill(0);
   textSize(75);
   text(hp, 400,120);
+  text(parry, 550,120);
   text(endGame - time, 668,120);
+  if((time + 1) % 3 == 0){
+    TA.changetB();
+    TB.changetB();
+    TC.changetB();
+    TD.changetB();
+  }
   if(time % 3 == 0 && reset == true){
     resetProjectile();
   }
   if((time - 1) % 3 == 0){
+    TA.changetA();
+    TB.changetA();
+    TC.changetA();
+    TD.changetA();
     reset = true;
   }
   
@@ -219,18 +234,15 @@ void textDisplay(String e){
 void state0(){
   int pos = 100;
   title = loadImage("title.png");
+  titlebg = loadImage("titlebg.png");
+  image(titlebg, 0, 0);
   image(title,200, pos);//Title
   fill(0);
   text("press any key", 260,500);
   if(keyPressed){
     gameState = 1;
   }
-  if(pos == 100 && random(1) > 0){
-    pos+= 10;
-  }
-  if(pos == 110 && random(1) > 0){
-    pos -= 10;
-  }
+  
 }
 
 void state1(){

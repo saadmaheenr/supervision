@@ -49,8 +49,8 @@ class Proj {
     acceleration = new PVector(0, 0);
     velocity.limit(limit); 
     PVector mainpos = getMainPos();
-    if((location.x >= mainpos.x - 60) && (location.x <= mainpos.x + 60)&&
-    (location.y >= mainpos.y - 60) && (location.y <= mainpos.y + 60)){
+    if((location.x >= mainpos.x - 50) && (location.x <= mainpos.x + 50)&&
+    (location.y >= mainpos.y - 50) && (location.y <= mainpos.y + 50)){
       if(damage == true){
         reduceHp();
         background(200);
@@ -65,7 +65,7 @@ class Proj {
     location.add(velocity);
     velocity.add(acceleration);
     acceleration = new PVector(0, 0);
-    velocity.limit(10); 
+    velocity.limit(15); 
   }
   void movet() {
     location.add(velocity);
@@ -96,7 +96,12 @@ class Proj {
   void applyForce(PVector force) {
     acceleration.add(force.div(mass));
   }
- 
+  void changetA(){
+    sprite = loadImage("turretA.png");
+  }
+  void changetB(){
+    sprite = loadImage("turretB.png");
+  }
   void pdisplay(){
     image(sprite, location.x, location.y, 125, 125);
   }
